@@ -59,13 +59,35 @@ public class UserController {
         }
         Integer userId = loginUser.getId();
         if (loginUser.getPassword().equals(DigestUtils.md5DigestAsHex(password.getBytes()))){
-            result = new Result("loginSucceed",userName,loginUser.getSucceedNum());
-
+            result = new Result(userId,"loginSucceed",userName,loginUser.getSucceedNum(),loginUser.getFastTime());
         }
         else {
             result = new Result("PasswordWrong");
         }
         return result;
     };
+
+    @PostMapping("/changeSuccessNum")
+    public Result changeSuccessNum(@RequestBody User user){
+        Result result = new Result();
+        User updateUser = userDao.selectOne( new LambdaQueryWrapper<User>().eq(User::getId,user.getId()));
+        System.out.println("改变次数"+user);
+        updateUser.setSucceedNum(user.getSucceedNum());
+        userDao.updateById(updateUser);
+        result.setStatus("changeNumSuccess");
+        return result;
+    }
+
+    @PostMapping("/changeFastTime")
+    public Result changeFastTime(@RequestBody User user){
+        Result result = new Result();
+        System.out.println("改变时间"+user);
+        User updateUser = userDao.selectOne( new LambdaQueryWrapper<User>().eq(User::getId,user.getId()));
+        updateUser.setFastTime(user.getFastTime());
+        userDao.updateById(updateUser);
+        result.setStatus("changeTimeSuccess");
+        return result;
+    }
+
 
 }
